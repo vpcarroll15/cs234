@@ -87,7 +87,7 @@ class DQN(QN):
         # add square loss
         self.add_loss_op(self.q, self.target_q)
 
-        # add optmizer for the main networks
+        # add optimizer for the main networks
         self.add_optimizer_op("q")
 
 
@@ -102,7 +102,7 @@ class DQN(QN):
         # tensorboard stuff
         self.add_summary()
 
-        # initiliaze all variables
+        # initialize all variables
         init = tf.global_variables_initializer()
         self.sess.run(init)
 
@@ -147,7 +147,6 @@ class DQN(QN):
         self.merged = tf.summary.merge_all()
         self.file_writer = tf.summary.FileWriter(self.config.output_path, 
                                                 self.sess.graph)
-
 
 
     def save(self):
