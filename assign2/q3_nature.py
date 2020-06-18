@@ -15,6 +15,23 @@ class NatureQN(Linear):
     Implementing DeepMind's Nature paper. Here are the relevant urls.
     https://storage.googleapis.com/deepmind-data/assets/papers/DeepMindNature14236Paper.pdf
     https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf
+
+    The exact architecture, shown schematically in Fig. 1, is as follows. The input to
+    the neural network consists of an 84 x 84 x 4 image produced by the preprocessing map w.
+
+    The first hidden layer convolves 32 filters of 8 x 8 with stride 4 with the
+    input image and applies a rectifier nonlinearity.
+    
+    The second hidden layer convolves 64 filters of 4 x 4 with stride 2, again
+    followed by a rectifier nonlinearity.
+
+    This is followed by a third convolutional layer that convolves 64 filters of 3 x 3 with
+    stride 1 followed by a rectifier.
+    
+    The final hidden layer is fully-connected and consists of 512 rectifier units.
+    
+    The output layer is a fully-connected linear layer with a single output for
+    each valid action.
     """
     def get_q_values_op(self, state, scope, reuse=False):
         """
@@ -28,20 +45,6 @@ class NatureQN(Linear):
 
         Returns:
             out: (tf tensor) of shape = (batch_size, num_actions)
-        """
-        # this information might be useful
-        num_actions = self.env.action_space.n
-
-        ##############################################################
-        """
-        TODO: implement the computation of Q values like in the paper
-                https://storage.googleapis.com/deepmind-data/assets/papers/DeepMindNature14236Paper.pdf
-                https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf
-
-              you may find the section "model architecture" of the appendix of the 
-              nature paper particulary useful.
-
-              store your result in out of shape = (batch_size, num_actions)
 
         HINT: 
             - You may find the following functions useful:
@@ -50,15 +53,17 @@ class NatureQN(Linear):
                 - tf.layers.dense
 
             - Make sure to also specify the scope and reuse
-
         """
-        ##############################################################
-        ################ YOUR CODE HERE - 10-15 lines ################ 
+        num_actions = self.env.action_space.n
+        
+        with tf.variable_scope(scope, reuse=reuse):
+            h1 = tf.layers.conv2d(state, filters=32, kernel_size=8, strides=4, padding="VALID", activation=tf.nn.relu)
+            h2 = tf.layers.conv2d(h1, filters=64, kernel_size=4, strides=2, padding="VALID", activation=tf.nn.relu)
+            h3 = tf.layers.conv2d(h2, filters=64, kernel_size=3, strides=1, padding="VALID", activation=tf.nn.relu)
+            flattened_h3 = tf.layers.flatten(h3)
+            h4 = tf.layers.dense(flattened_h3, 512, activation=tf.nn.relu)
+            out = tf.layers.dense(h4, num_actions)
 
-        pass
-
-        ##############################################################
-        ######################## END YOUR CODE #######################
         return out
 
 
